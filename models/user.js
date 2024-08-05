@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// Definición del esquema de User
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -16,22 +17,11 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     image: {
-        type: String,
+        type: String, // o puedes usar Buffer si prefieres almacenar la imagen directamente en la base de datos
         required: false
     }
 });
 
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
-
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (err) {
-        next(err);
-    }
-});
 
 // Método para comparar la contraseña ingresada con la hasheada
 userSchema.methods.comparePassword = function(password) {
@@ -40,4 +30,5 @@ userSchema.methods.comparePassword = function(password) {
 
 // Creación del modelo User
 const user = mongoose.model('user', userSchema);
+
 module.exports = user;
